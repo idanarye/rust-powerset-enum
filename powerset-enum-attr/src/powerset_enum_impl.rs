@@ -44,11 +44,16 @@ pub fn powerset_enum_impl(mut input: syn::ItemEnum) -> Result<TokenStream, Error
     }
 
     let variant_trait_impls = gen_with_variant_trait_impls(&input.ident, &replaced_variants)?;
+    let error_from_trait_impls = gen_error_from_trait_impls(&input.ident, &replaced_variants)?;
+    let enum_from_trait_impls = gen_enum_from_trait_impls(&input.ident, &replaced_variants)?;
+    // println!("{}", enum_from_trait_impls);
     let powerset_macro = gen_powerset_macro(&input.ident, &replaced_variants)?;
 
     Ok(quote!{
         #input
         #variant_trait_impls
+        #error_from_trait_impls
+        // #enum_from_trait_impls
         #powerset_macro
     })
 }
@@ -64,6 +69,10 @@ fn make_generic_ident(prefix: &str, idx: usize) -> syn::Ident {
     syn::Ident::new(&format!("{}{}", prefix, idx), proc_macro2::Span::call_site())
 }
 
+fn make_generic_idents(prefix: &'static str, rng: std::ops::Range<usize>) -> impl Iterator<Item = syn::Ident> {
+    rng.map(move |i| make_generic_ident(prefix, i))
+}
+
 fn make_generic_type(ident: syn::Ident) -> syn::Type {
     syn::Type::Path(syn::TypePath {
         qself: None,
@@ -71,10 +80,75 @@ fn make_generic_type(ident: syn::Ident) -> syn::Type {
     })
 }
 
+fn make_generic_types(prefix: &'static str, rng: std::ops::Range<usize>) -> impl Iterator<Item = syn::Type> {
+    rng.map(move |i| make_generic_type(make_generic_ident(prefix, i)))
+}
+
 fn make_never() -> syn::Type {
     syn::Type::Never(syn::TypeNever{
         bang_token: Default::default()
     })
+}
+
+fn gen_error_from_trait_impls(enum_ident: &syn::Ident, replaced_variants: &[ReplacedVariant]) -> Result<TokenStream, Error> {
+    let impls = replaced_variants.iter().map(|replaced_variant| {
+        let ReplacedVariant {idx, ty, variant_ident} = &replaced_variant;
+        let impl_generics = replaced_variants.iter().filter(|v| v.idx != *idx).map(|v| make_generic_ident("T", v.idx));
+        let generic_params = replaced_variants.iter().map(|v| {
+            if v.idx == *idx {
+                ty.clone()
+            } else {
+                make_generic_type(make_generic_ident("T", v.idx))
+            }
+        });
+        quote!{
+            impl<#(#impl_generics),*> From<#ty> for #enum_ident<#(#generic_params),*> {
+                fn from(value: #ty) -> Self {
+                    #enum_ident::#variant_ident(value)
+                }
+            }
+        }
+    });
+    Ok(quote!(#( #impls )*))
+}
+
+fn gen_enum_from_trait_impls(enum_ident: &syn::Ident, replaced_variants: &[ReplacedVariant]) -> Result<TokenStream, Error> {
+    let impls = replaced_variants.iter().map(|replaced_variant| {
+        let ReplacedVariant {idx, ty, ..} = &replaced_variant;
+        let impl_generics = make_generic_idents("O", 0..*idx)
+            .chain(make_generic_idents("N", 0..*idx))
+            .chain(make_generic_idents("T", (*idx + 1)..replaced_variants.len()));
+        let from_generic_params = make_generic_types("O", 0..*idx)
+            .chain(std::iter::once(make_never()))
+            .chain(make_generic_types("T", (*idx + 1)..replaced_variants.len()));
+        let from_type = quote!(#enum_ident<#(#from_generic_params),*>);
+        let to_generic_params = make_generic_types("N", 0..*idx)
+            .chain(std::iter::once(ty.clone()))
+            .chain(make_generic_types("T", (*idx + 1)..replaced_variants.len()));
+        let mid_generic_params = make_generic_types("N", 0..*idx)
+            .chain(std::iter::once(make_never()))
+            .chain(make_generic_types("T", (*idx + 1)..replaced_variants.len()));
+        let mid_type = quote!(#enum_ident<#(#mid_generic_params),*>);
+        let variant_match_arms = replaced_variants.iter().filter(|v| v.idx != *idx).map(|other_variant| {
+            let variant_ident = &other_variant.variant_ident;
+            quote!{
+                #enum_ident::#variant_ident(e) => #enum_ident::#variant_ident(e)
+            }
+        });
+        quote!{
+            impl<#(#impl_generics),*> From<#from_type> for #enum_ident<#(#to_generic_params),*>
+                where #mid_type: From<#from_type>
+            {
+                fn from(value: #from_type) -> Self {
+                    let mid_value: #mid_type = #enum_ident::from(value);
+                    match mid_value {
+                        #(#variant_match_arms),*
+                    }
+                }
+            }
+        }
+    });
+    Ok(quote!(#( #impls )*))
 }
 
 fn gen_with_variant_trait_impls(enum_ident: &syn::Ident, replaced_variants: &[ReplacedVariant]) -> Result<TokenStream, Error> {

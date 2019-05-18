@@ -27,12 +27,16 @@ struct Data {
 
 fn load_data_file_unchecked(path: &Path) -> Result<Data, Error![io::Error, serde_json::Error]> {
     let file = fs::File::open(path).map_err(Error::IoError)?;
+    // let file = fs::File::open(path).map_err(|e| Error::<io::Error, serde_json::Error, _>::IoError(e))?;
+    // let file = fs::File::open(path).map_err(|e| e.into())?;
     serde_json::from_reader(file).map_err(Error::JsonError)
 }
 
 fn load_data_file(path: &Path) -> Result<Data, Error![io::Error, serde_json::Error, FieldError]> {
-    let file = fs::File::open(path).map_err(Error::IoError)?;
+    // let file = fs::File::open(path).map_err(Error::IoError)?;
+    let file = fs::File::open(path).map_err(|e| Error::<io::Error, serde_json::Error, FieldError>::IoError(e))?;
     let data: Data = serde_json::from_reader(file).map_err(Error::JsonError)?;
+    // let data = load_data_file_unchecked(&path).map_err(Into::into)?;
     if data.field > 100 {
         return Err(Error::FieldError(FieldError));
     }
@@ -42,8 +46,8 @@ fn load_data_file(path: &Path) -> Result<Data, Error![io::Error, serde_json::Err
 fn load_data_file_or_default(path: &Path) -> Result<Data, Error![serde_json::Error, FieldError]> {
     load_data_file(path).or_else(|e| match e {
         Error::IoError(_) => Ok(Data::default()),
-        Error::JsonError(e) => Err(Error::JsonError(e)),
-        Error::FieldError(e) => Err(Error::FieldError(e)),
+        Error::JsonError(e) => Err(e.into()),
+        Error::FieldError(e) => Err(e.into()),
     })
 }
 
