@@ -7,7 +7,7 @@ use quote::quote;
 pub struct PowersetMacroInput {
     empty_powerset: syn::Type,
     comma: Option<syn::token::Comma>,
-    types_in_powerset: syn::punctuated::Punctuated<syn::GenericParam, syn::token::Comma>,
+    types_in_powerset: syn::punctuated::Punctuated<syn::Type, syn::token::Comma>,
 }
 
 impl syn::parse::Parse for PowersetMacroInput {
