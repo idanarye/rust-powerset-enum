@@ -1,6 +1,12 @@
 # Powerset Enums
 
-## Features
+A poor man's anonymous `enum`, useful mostly for error handling. Turn your
+`Error` `enum` into a _Powerset Enum_ to allow taking subsets of the original enums.
+
+See the examples, specifically
+[with_powerset_enums.rs](blob/master/powerset-enum-examples/examples/with_powerset_enums.rs)
+vs
+[without_powerset_enums.rs](blob/master/powerset-enum-examples/examples/without_powerset_enums.rs), to understand how this works.
 
 ## License
 
