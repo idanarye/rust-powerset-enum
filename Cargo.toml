@@ -1,2 +1,2 @@
 [workspace]
-members = ["powerset-enum-traits", "powerset-enum-attr", "powerset-enum", "powerset-enum-examples"]
+members = ["powerset-enum-traits", "powerset-enum-attr", "powerset-enum"]
