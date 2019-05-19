@@ -42,7 +42,7 @@ fn load_data_file_or_default(path: &Path) -> Result<Data, Error> {
 
 fn load_data_best_effort(path: &Path) -> Data {
     load_data_file_or_default(path).unwrap_or_else(|e| match e {
-        Error::IoError(e) => panic!("IO error should have been impossible, but we got {}", e),
+        Error::IoError(e) => unreachable!("IO error should have been impossible, but we got {}", e),
         Error::JsonError(_) => {
             let content =
                 fs::read_to_string(&path).expect("we managed read it before - why not now?");
