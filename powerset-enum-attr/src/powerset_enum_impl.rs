@@ -48,8 +48,6 @@ pub fn powerset_enum_impl(mut input: syn::ItemEnum) -> Result<TokenStream, Error
     let never_variant_trait_impls = gen_never_with_variant_trait_impl(&input.ident, &replaced_variants)?;
     let without_trait_impls = gen_without_trait_impls(&input.ident, &replaced_variants)?;
     let methods_on_enum_impl = gen_methods_on_enum_impl(&input.ident, &replaced_variants)?;
-    let extract_only_impls = gen_extract_only_impls(&input.ident, &replaced_variants)?;
-    // println!("{}", extract_only_impls);
     let powerset_macro = gen_powerset_macro(&input.ident, &replaced_variants)?;
 
     Ok(quote!{
@@ -59,9 +57,6 @@ pub fn powerset_enum_impl(mut input: syn::ItemEnum) -> Result<TokenStream, Error
         #never_variant_trait_impls
         #without_trait_impls
         #methods_on_enum_impl
-        #extract_only_impls
-        // #error_from_trait_impls
-        // #enum_from_trait_impls
         #powerset_macro
     })
 }
@@ -255,30 +250,6 @@ fn gen_without_trait_impls(enum_ident: &syn::Ident, replaced_variants: &[Replace
                 fn remove_possibility(self) -> Result<Self::Without, #ty> {
                     match self {
                         #(#extract_match_arms),*
-                    }
-                }
-            }
-        }
-    });
-    Ok(quote!(#( #impls )*))
-}
-
-fn gen_extract_only_impls(enum_ident: &syn::Ident, replaced_variants: &[ReplacedVariant]) -> Result<TokenStream, Error> {
-    let impls = replaced_variants.iter().map(|replaced_variant| {
-        let ReplacedVariant {idx, ty, variant_ident} = &replaced_variant;
-        // let generic_params = replaced_variants.iter().filter(|v| v.idx != *idx).map(|v| make_generic_ident("T", v.idx));
-        let generic_params = replaced_variants.iter().map(|v| {
-            if v.idx == *idx {
-                ty.clone()
-            } else {
-                make_never()
-            }
-        });
-        quote!{
-            impl #enum_ident<#(#generic_params),*> {
-                pub fn extract_only(self) -> #ty {
-                    match self {
-                        #enum_ident::#variant_ident(err) => err,
                     }
                 }
             }
