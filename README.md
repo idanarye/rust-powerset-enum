@@ -12,6 +12,13 @@ See the examples, specifically
 vs
 [without_powerset_enums.rs](blob/master/powerset-enum/examples/without_powerset_enums.rs), to understand how this works.
 
+Note: this is a nightly only crate, and to use it you need to enable the
+following feature flags:
+
+```rust
+#![feature(never_type, exhaustive_patterns, proc_macro_hygiene)]
+```
+
 ## License
 
 Licensed under either of

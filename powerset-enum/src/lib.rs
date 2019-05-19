@@ -1,6 +1,13 @@
 //! The [`#[powerset_enum]`](../powerset_enum_attr/attr.powerset_enum.html) attribute parametrizes an `enum` to make it a powerset (set of all
 //! subsets), and create a macro with the same name of the `enum` for easy notation of the subsets.
 //!
+//! Note: this is a nightly only crate, and to use it you need to enable the following feature
+//! flags:
+//!
+//! ```ignore
+//! #![feature(never_type, exhaustive_patterns, proc_macro_hygiene)]
+//! ```
+//!
 //! Each variant of the `enum` decorated by `#[powerset_enum]` must be a tuple-struct variant with
 //! a single item, and the type of that item must be unique within that `enum`.  Parametrization of
 //! the `enum` (beside the one created by `#[powerset_enum]`) is not supported.
