@@ -1,5 +1,6 @@
 [package]
 name = "powerset-enum-attr"
+description = "A reexport dependency for the powerset-enum crate"
 version = "0.1.0"
 authors = ["IdanArye <idanarye@gmail.com>"]
 edition = "2018"
