@@ -30,8 +30,7 @@ fn load_data_file_unchecked(path: &Path) -> Result<Data, Error> {
 }
 
 fn load_data_file(path: &Path) -> Result<Data, Error> {
-    let file = fs::File::open(path).map_err(Error::IoError)?;
-    let data: Data = serde_json::from_reader(file).map_err(Error::JsonError)?;
+    let data = load_data_file_unchecked(&path)?;
     if data.field < 20 {
         return Err(Error::FieldError(FieldError));
     }

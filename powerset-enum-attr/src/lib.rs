@@ -1,3 +1,4 @@
+#![recursion_limit="128"]
 extern crate proc_macro;
 
 use syn::parse_macro_input;
