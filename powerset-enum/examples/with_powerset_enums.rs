@@ -9,8 +9,7 @@ use serde_derive::Deserialize;
 use powerset_enum::powerset_enum;
 use powerset_enum::Extract;
 
-#[derive(Debug, err_derive::Error)]
-#[error(display = "field is out of range")]
+#[derive(Debug)]
 struct FieldError;
 
 #[powerset_enum]

@@ -5,17 +5,13 @@ use std::io;
 
 use serde_derive::Deserialize;
 
-#[derive(Debug, err_derive::Error)]
-#[error(display = "field is out of range")]
+#[derive(Debug)]
 struct FieldError;
 
-#[derive(Debug, err_derive::Error)]
+#[derive(Debug)]
 enum Error {
-    #[error(display = "{}", _0)]
     IoError(io::Error),
-    #[error(display = "{}", _0)]
     JsonError(serde_json::Error),
-    #[error(display = "{}", _0)]
     FieldError(FieldError),
 }
 
