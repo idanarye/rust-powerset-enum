@@ -1,4 +1,8 @@
-# Powerset Enums
+[![Build Status](https://api.travis-ci.org/idanarye/rust-inherent-pub.svg?branch=master)](https://travis-ci.org/idanarye/rust-powerset-enum)
+[![Latest Version](https://img.shields.io/crates/v/powerset-enum.svg)](https://crates.io/crates/powerset-enum)
+[![Rust Documentation](https://img.shields.io/badge/api-rustdoc-blue.svg)](https://idanarye.github.io/rust-powerset-enum/)
+
+# Rust Powerset Enum
 
 A poor man's anonymous `enum`, useful mostly for error handling. Turn your
 `Error` `enum` into a _Powerset Enum_ to allow taking subsets of the original enums.
