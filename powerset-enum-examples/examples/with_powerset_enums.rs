@@ -40,13 +40,15 @@ fn load_data_file(path: &Path) -> Result<Data, Error![io::Error, serde_json::Err
 }
 
 fn load_data_file_or_default(path: &Path) -> Result<Data, Error![serde_json::Error, FieldError]> {
-    load_data_file(path).extract::<std::io::Error>().unwrap_or(Ok(Data::default()))
+    load_data_file(path)
+        .extract::<std::io::Error>().unwrap_or(Ok(Data::default()))
 }
 
 fn load_data_best_effort(path: &Path) -> Data {
     load_data_file_or_default(path).unwrap_or_else(|e| match e {
         Error::JsonError(_) => {
-            let content = fs::read_to_string(&path).expect("we managed read it before - why not now?");
+            let content =
+                fs::read_to_string(&path).expect("we managed read it before - why not now?");
             if let Some(m) = regex::Regex::new(r"\d+").unwrap().find(&content) {
                 Data {
                     field: m.as_str().parse().unwrap(),
@@ -54,27 +56,31 @@ fn load_data_best_effort(path: &Path) -> Data {
             } else {
                 Data::default()
             }
-        },
-        Error::FieldError(_) => load_data_file_unchecked(path).expect("we managed to read and parse it before - why not now?"),
+        }
+        Error::FieldError(_) => load_data_file_unchecked(path)
+            .expect("we managed to read and parse it before - why not now?"),
     })
 }
 
 fn main() {
-    let file_maker = powerset_enum_examples::FileMaker::new();
-    let good_file = file_maker.make("good.json", r#"
+    let tempdir = tempfile::tempdir().unwrap();
+    let good_file = tempdir.path().join("good.json");
+    fs::write(&good_file, r#"
     {
         "field": 42
     }
-    "#);
-    let bad_data = file_maker.make("bad-data.json", r#"
+    "#).unwrap();
+    let bad_data = tempdir.path().join("bad-data.json");
+    fs::write(&bad_data, r#"
     {
         "field": 120
     }
-    "#);
-    let malformed = file_maker.make("malformed.json", r#"
+    "#).unwrap();
+    let malformed = tempdir.path().join("malformed.json");
+    fs::write(&malformed, r#"
     {
         "field": 23
-    "#);
+    "#).unwrap();
 
     println!("Good file: {:?}", load_data_best_effort(&good_file));
     println!("Bad data: {:?}", load_data_best_effort(&bad_data));

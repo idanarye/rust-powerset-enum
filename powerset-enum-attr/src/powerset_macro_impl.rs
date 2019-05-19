@@ -1,7 +1,7 @@
-use proc_macro2::{TokenStream};
+use proc_macro2::TokenStream;
 
-use syn::parse::Error;
 use quote::quote;
+use syn::parse::Error;
 
 #[derive(Debug)]
 pub struct PowersetMacroInput {
@@ -21,7 +21,11 @@ impl syn::parse::Parse for PowersetMacroInput {
 }
 
 pub fn powerset_macro_impl(input: PowersetMacroInput) -> Result<TokenStream, Error> {
-    let PowersetMacroInput { empty_powerset, types_in_powerset, .. } = input;
+    let PowersetMacroInput {
+        empty_powerset,
+        types_in_powerset,
+        ..
+    } = input;
     let mut result = quote!(#empty_powerset);
     for ty in types_in_powerset {
         result = quote!(<#result as powerset_enum::WithVariant<#ty>>::With);
