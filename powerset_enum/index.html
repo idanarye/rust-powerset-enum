@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `powerset_enum` crate."><meta name="keywords" content="rust, rustlang, rust-lang, powerset_enum"><title>powerset_enum - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../powerset_enum/index.html'><img src='../rust-logo.png' alt='logo' width='100'></a><p class='location'>Crate powerset_enum</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all powerset_enum's items</p></a><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'powerset_enum', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/powerset_enum/lib.rs.html#1-98' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>powerset_enum</a></span></h1><div class='docblock'><p>The <a href="../powerset_enum_attr/attr.powerset_enum.html"><code>#[powerset_enum]</code></a> attribute parametrizes an <code>enum</code> to make it a powerset (set of all
+subsets), and create a macro with the same name of the <code>enum</code> for easy notation of the subsets.</p>
+<p>Note: this is a nightly only crate, and to use it you need to enable the following feature
+flags:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">never_type</span>, <span class="ident">exhaustive_patterns</span>, <span class="ident">proc_macro_hygiene</span>)]</span></pre></div>
+<p>Each variant of the <code>enum</code> decorated by <code>#[powerset_enum]</code> must be a tuple-struct variant with
+a single item, and the type of that item must be unique within that <code>enum</code>.  Parametrization of
+the <code>enum</code> (beside the one created by <code>#[powerset_enum]</code>) is not supported.</p>
+<p>To use a specific parametrization, use a macro with the same name of the enum and provide to it
+the list of types you require.</p>
+<p>An <code>upcast</code> method is created on the <code>enum</code> type to convert any subset to any superset of that
+subsets. Usually used with <a href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html#method.map_err" title="Result::map_err">Result::map_err</a>.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">fn</span> <span class="ident">foo</span>(...) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>..., <span class="macro">E</span><span class="macro">!</span>[<span class="ident">A</span>, <span class="ident">B</span>]<span class="op">&gt;</span> {
+    ...
+}
+<span class="kw">fn</span> <span class="ident">bar</span>(...) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>..., <span class="macro">E</span><span class="macro">!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>]<span class="op">&gt;</span> {
+    <span class="ident">foo</span>(...).<span class="ident">map_err</span>(<span class="ident">E</span>::<span class="ident">upcast</span>)
+}</pre></div>
+<p>The <a href="../powerset_enum/trait.Extract.html" title="Extract">Extract</a> <code>trait</code> provides an <code>extract</code> method on the <code>enum</code> type and on <a href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="Result">Result</a> with the
+<code>enum</code> as their error to extract a new <a href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="Result">Result</a> where the OK value is the original value
+without the extracted variant and the error is the extracted variant:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">fn</span> <span class="ident">baz</span>(...) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>..., <span class="macro">E</span><span class="macro">!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">D</span>]<span class="op">&gt;</span> {
+    <span class="ident">bar</span>(...).<span class="ident">extract</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;C is not allowed at all&quot;</span>)
+}</pre></div>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">never_type</span>, <span class="ident">exhaustive_patterns</span>, <span class="ident">proc_macro_hygiene</span>)]</span>
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Exception1</span>;
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Exception2</span>;
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Exception3</span>;
+
+<span class="attribute">#[<span class="ident">powerset_enum</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
+    <span class="ident">Exception1</span>(<span class="ident">Exception1</span>),
+    <span class="ident">Exception2</span>(<span class="ident">Exception2</span>),
+    <span class="ident">Exception3</span>(<span class="ident">Exception3</span>),
+}
+
+<span class="kw">fn</span> <span class="ident">foo</span>(<span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="macro">Error</span><span class="macro">!</span>[<span class="ident">Exception1</span>, <span class="ident">Exception2</span>]<span class="op">&gt;</span> {
+    <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">x</span> {
+        <span class="number">1</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Exception1</span>)<span class="question-mark">?</span>,
+        <span class="number">2</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Exception2</span>)<span class="question-mark">?</span>,
+        <span class="ident">x</span> <span class="op">=&gt;</span> <span class="ident">x</span>,
+    })
+}
+
+<span class="kw">fn</span> <span class="ident">bar</span>(<span class="ident">x</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="macro">Error</span><span class="macro">!</span>[<span class="ident">Exception1</span>, <span class="ident">Exception3</span>]<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">3</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Exception3</span>)<span class="question-mark">?</span>;
+    }
+    <span class="ident">foo</span>(<span class="ident">x</span>)
+        <span class="comment">// Specifically handle `Exception2`:</span>
+        .<span class="ident">extract</span>::<span class="op">&lt;</span><span class="ident">Exception2</span><span class="op">&gt;</span>().<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="number">2</span>))
+        <span class="comment">// Convert `Result&lt;usize, Error![Exception1]&gt;` to `Result&lt;usize, Error![Exception1, Exception3]&gt;`:</span>
+        .<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">upcast</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">1</span>;
+
+    <span class="kw">match</span> <span class="ident">foo</span>(<span class="ident">x</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;OK - got {}&quot;</span>, <span class="ident">n</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Exception1</span>(<span class="kw">_</span>)) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Got exception 1&quot;</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Exception2</span>(<span class="kw">_</span>)) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Got exception 2&quot;</span>),
+        <span class="comment">// No Exception3 match arm needed - `foo` cannot return it</span>
+    }
+
+    <span class="kw">match</span> <span class="ident">bar</span>(<span class="ident">x</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;OK - got {}&quot;</span>, <span class="ident">n</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Exception1</span>(<span class="kw">_</span>)) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Got exception 1&quot;</span>),
+        <span class="comment">// No Exception2 match arm needed - `bar` cannot return it</span>
+        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Exception3</span>(<span class="kw">_</span>)) <span class="op">=&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Got exception 3&quot;</span>),
+    }
+}</pre></div>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
+<table><tr><td><code>pub use powerset_enum_attr::<a class="attr" href="../powerset_enum_attr/attr.powerset_enum.html" title="attr powerset_enum_attr::powerset_enum">powerset_enum</a>;</code></td></tr><tr><td><code>pub use powerset_enum_attr::<a class="macro" href="../powerset_enum_attr/macro.powerset.html" title="macro powerset_enum_attr::powerset">powerset</a>;</code></td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.Extract.html" title='powerset_enum::Extract trait'>Extract</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="trait" href="trait.WithVariant.html" title='powerset_enum::WithVariant trait'>WithVariant</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="trait" href="trait.WithoutVariant.html" title='powerset_enum::WithoutVariant trait'>WithoutVariant</a></td><td class='docblock-short'></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "powerset_enum";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

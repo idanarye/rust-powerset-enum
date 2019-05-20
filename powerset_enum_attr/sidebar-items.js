@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["powerset_enum","Parametrize an `enum` to make it a powerset (set of all subsets), and create a macro with the same name of the `enum` for easy notation of the subsets."]],"macro":[["powerset",""]]});
