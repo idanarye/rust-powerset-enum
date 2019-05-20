@@ -1,12 +1,14 @@
 [package]
 name = "powerset-enum"
 description = "A poor man's anonymous enum"
+readme = "../README.md"
 version = "0.1.0"
 authors = ["IdanArye <idanarye@gmail.com>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
 repository = "https://github.com/idanarye/rust-powerset-enum"
 keywords = ["powerset", "anonymous-enums", "error-handling"]
+categories = ["rust-patterns"]
 
 [dependencies]
 powerset-enum-traits = { version = "0.1.0", path = "../powerset-enum-traits" }

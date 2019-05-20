@@ -8,9 +8,9 @@ A poor man's anonymous `enum`, useful mostly for error handling. Turn your
 `Error` `enum` into a _Powerset Enum_ to allow taking subsets of the original enums.
 
 See the examples, specifically
-[with_powerset_enums.rs](blob/master/powerset-enum/examples/with_powerset_enums.rs)
+[with_powerset_enums.rs](powerset-enum/examples/with_powerset_enums.rs)
 vs
-[without_powerset_enums.rs](blob/master/powerset-enum/examples/without_powerset_enums.rs), to understand how this works.
+[without_powerset_enums.rs](powerset-enum/examples/without_powerset_enums.rs), to understand how this works.
 
 Note: this is a nightly only crate, and to use it you need to enable the
 following feature flags:
